@@ -201,6 +201,10 @@ void ancs_notifications(ancs_notification_t* notif) {
     
 }
 
+void eepromWrite(int address, uint8_t value)
+{
+eeprom_write_byte((unsigned char *) address, value);
+}
 
 void setup(void)
 {
@@ -215,7 +219,7 @@ void setup(void)
     
     //If things get really crazy, uncomment this line. It wipes the saved EEPROM information for the Nordic chip. Good to do this if the services.h file gets updated.
     //After it is wiped, comment and reupload.
-    //eeprom_write(0, 0xFF);
+    //eepromWrite(0, 0xFF);
     
     Serial.println(F("Arduino setup"));
     notif.setup();
