@@ -9,14 +9,14 @@
 
 #include "notif.h"
 
-#define DEBUG1
+//#define DEBUG1
 
 #include "utilities.h"
 #include "services.h"
 #include "pack_lib.h"
 #include <SPI.h>
 
-
+extern boolean command_send_enable;
 
 void __ble_assert(const char *file, uint16_t line)
 {
@@ -418,6 +418,8 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
         //Note: This may be called multiple times after the Arduino has connected to the right phone
         debug_println(F("phone Detected."));
 
+       command_send_enable = true;
+        
         // Detection of ANCS pipes
        if (lib_aci_is_discovery_finished(&aci_state)) {
             debug_println(F(" Service Discovery is over."));
@@ -448,7 +450,7 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
             }
 
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)) {
-
+                reset_data_required = false;
                 debug_println(F("  -> ANCS Data Source Closed"));
                 if (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)){
                     debug_println(F("  -> ANCS Data Source Pipe: Failure opening."));
@@ -457,30 +459,47 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
                 }
             } else {
                 debug_println(F("  -> ANCS Data Source Open"));
+                if (!reset_notification_required && reset_data_required && lib_aci_is_pipe_available(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)) {
+                    debug_println(F("  -> ANCS Data Source: Reseting Pipe"));
+            
+                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_DATA_SOURCE_RX));
+
+                    
+                    
+                    reset_data_required = false;
+                    
+                    if (connect_callback_handle != NULL){
+                        connect_callback_handle();
+                    }
+                    
+                }
             }
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
                 debug_println(F("  -> ANCS Notification Source closed"));
-                if (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
+                reset_notification_required = false;
+                if ( (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX))) {
                     debug_println(F("  -> ANCS Notification Source Pipe: Failure opening."));
                 } else {
                     debug_println(F("  -> ANCS Notification Source Pipe: Success opening."));
-
                 }
             } else {
                debug_println(F("  -> ANCS Notification Source Open"));
-                if (force_discovery_required && lib_aci_is_pipe_available(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
+                if (reset_notification_required && lib_aci_is_pipe_available(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
                     debug_println(F("  -> ANCS Notification Source: Reseting Pipe"));
-                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_CONTROL_POINT_TX_ACK));
-                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_GATT_SERVICE_CHANGED_TX_ACK));
+                    //debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_CONTROL_POINT_TX_ACK));
+                    //debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_GATT_SERVICE_CHANGED_TX_ACK));
                     debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_NOTIFICATION_SOURCE_RX));
-                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_DATA_SOURCE_RX));
+                    
                     /*
                     uint8_t* buffer;
                     buffer = (uint8_t*)malloc(4);
                     pack(buffer, "BB", 0x0000, 0xFFFF );
                     lib_aci_send_data(PIPE_GATT_SERVICE_CHANGED_TX_ACK, buffer, 4);
-                    free(buffer);*/
-                    force_discovery_required = false;
+                    free(buffer);
+                    */
+                
+                    reset_notification_required = false;
+                   
                     if (connect_callback_handle != NULL){
                         connect_callback_handle();
                     }
@@ -667,7 +686,8 @@ void Notif::ReadNotifications()
                 debug_println(F("Evt Connected"));
                 aci_state.data_credit_available = aci_state.data_credit_total;
                 timing_change_done = false;
-                force_discovery_required = true;
+                reset_notification_required = true;
+                reset_data_required = true;
 
                 /*
                  Get the device version of the nRF8001 and store it in the Hardware Revision String
@@ -836,7 +856,8 @@ Notif::Notif(uint8_t rqPin, uint8_t rdPin) {
     bonded_first_time = true;
     setup_required = false;
     timing_change_done = false;
-    force_discovery_required = true;
+    reset_data_required = true;
+    reset_notification_required = true;
 
 
 }

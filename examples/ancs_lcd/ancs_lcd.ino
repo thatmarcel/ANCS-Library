@@ -12,7 +12,7 @@
 #include <notif.h>
 
 #include <LiquidCrystal.h>
-#include <LCDKeypad.h>
+
 
 #define LCD_SIZE 16
 LiquidCrystal lcd(8, 13, 9, 4, 5, 6, 7);
@@ -208,10 +208,11 @@ eeprom_write_byte((unsigned char *) address, value);
 
 void setup(void)
 {
+/*
     Serial.begin(115200);
     //Wait until the serial port is available (useful only for the Leonardo)
     //As the Leonardo board is not reseted every time you open the Serial Monitor
-    /*
+    
 #if defined (__AVR_ATmega32U4__)
     while(!Serial)
     {}

@@ -5,6 +5,8 @@
 
 
 #define PACK_LITTLE_ENDIAN
+//#define DEBUG2
+//#define DEBUG1
 #include "pack_lib.h"
 #include "utilities.h"
 #include "linked_list.h"
@@ -133,6 +135,7 @@ void ancs_get_notification_data(uint32_t uid) {
          Serial.print(uid, DEC);
          Serial.print(F(") - Need Command Send - "));
          Serial.println(millis() - last_command_send);
+          debug_print(command_send_enable);
      }
     
 }

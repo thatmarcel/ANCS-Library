@@ -64,7 +64,8 @@ private:
      */
     bool timing_change_done;
     bool setup_required;
-    bool force_discovery_required;
+    bool reset_notification_required;
+    bool reset_data_required;
     
     // aci_struct that will contain
     // total initial credits
