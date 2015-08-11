@@ -450,7 +450,6 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
             }
 
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)) {
-                reset_data_required = false;
                 debug_println(F("  -> ANCS Data Source Closed"));
                 if (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)){
                     debug_println(F("  -> ANCS Data Source Pipe: Failure opening."));
@@ -476,7 +475,6 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
             }
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
                 debug_println(F("  -> ANCS Notification Source closed"));
-                reset_notification_required = false;
                 if ( (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX))) {
                     debug_println(F("  -> ANCS Notification Source Pipe: Failure opening."));
                 } else {
