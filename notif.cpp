@@ -451,20 +451,19 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
 
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)) {
                 debug_println(F("  -> ANCS Data Source Closed"));
+                
                 if (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)){
                     debug_println(F("  -> ANCS Data Source Pipe: Failure opening."));
                 } else {
                     debug_println(F("  -> ANCS Data Source Pipe: Success opening."));
                 }
+               
             } else {
                 debug_println(F("  -> ANCS Data Source Open"));
                 if (!reset_notification_required && reset_data_required && lib_aci_is_pipe_available(&aci_state, PIPE_ANCS_DATA_SOURCE_RX)) {
                     debug_println(F("  -> ANCS Data Source: Reseting Pipe"));
-            
-                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_DATA_SOURCE_RX));
+                    lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_DATA_SOURCE_RX);
 
-                    
-                    
                     reset_data_required = false;
                     
                     if (connect_callback_handle != NULL){
@@ -475,19 +474,20 @@ void Notif::PipeStatus(aci_evt_t *aci_evt)
             }
             if (lib_aci_is_pipe_closed(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
                 debug_println(F("  -> ANCS Notification Source closed"));
+                
                 if ( (!lib_aci_open_remote_pipe(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX))) {
                     debug_println(F("  -> ANCS Notification Source Pipe: Failure opening."));
                 } else {
                     debug_println(F("  -> ANCS Notification Source Pipe: Success opening."));
                 }
+                
             } else {
                debug_println(F("  -> ANCS Notification Source Open"));
                 if (reset_notification_required && lib_aci_is_pipe_available(&aci_state, PIPE_ANCS_NOTIFICATION_SOURCE_RX)) {
                     debug_println(F("  -> ANCS Notification Source: Reseting Pipe"));
-                    //debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_CONTROL_POINT_TX_ACK));
-                    //debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_GATT_SERVICE_CHANGED_TX_ACK));
-                    debug_println(lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_NOTIFICATION_SOURCE_RX));
-                    
+    
+                    lib_aci_close_remote_pipe(&aci_state,PIPE_ANCS_NOTIFICATION_SOURCE_RX);
+
                     /*
                     uint8_t* buffer;
                     buffer = (uint8_t*)malloc(4);
