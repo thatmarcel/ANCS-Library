@@ -71,7 +71,7 @@
         </Characteristic>
     </Service>
     <Gapsettings>
-        <Name>Notif</Name>
+        <Name>BlauZahn</Name>
         <DeviceNameWriteLength>0</DeviceNameWriteLength>
         <LocalPipeOnDeviceName>false</LocalPipeOnDeviceName>
         <DeviceNameShortLength>4</DeviceNameShortLength>
